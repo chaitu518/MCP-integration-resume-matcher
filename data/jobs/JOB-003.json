@@ -1,0 +1,20 @@
+{
+  "job_id": "JOB-003",
+  "title": "Data Engineer",
+  "company": "Acme Capital Markets",
+  "location": "Chennai",
+  "min_years": 3,
+  "required_skills": [
+    "Python",
+    "SQL",
+    "Apache Spark",
+    "Airflow"
+  ],
+  "preferred_skills": [
+    "Kafka",
+    "Snowflake",
+    "AWS",
+    "dbt"
+  ],
+  "description": "Build batch and streaming pipelines with Spark and Airflow, model data in Snowflake with dbt, and ingest real-time events from Kafka."
+}

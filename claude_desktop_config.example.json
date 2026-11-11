@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "resume-filesystem": {
+      "command": "python",
+      "args": ["/ABSOLUTE/PATH/TO/mcp-resume-matcher/filesystem_mcp_server.py"]
+    },
+    "resume-jobs-db": {
+      "command": "python",
+      "args": ["/ABSOLUTE/PATH/TO/mcp-resume-matcher/jobs_db_mcp_server.py"]
+    }
+  }
+}

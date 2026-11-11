@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Resume Matcher – MCP architecture diagrams</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+ body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;margin:0;background:#fafafa;color:#1f2328}
+ header{padding:24px 40px;background:#fff;border-bottom:1px solid #e5e7eb}
+ h1{margin:0;font-size:22px} p.sub{margin:6px 0 0;color:#57606a}
+ section{background:#fff;margin:24px 40px;padding:20px 28px;border:1px solid #e5e7eb;border-radius:10px}
+ h2{font-size:17px;margin:0 0 12px} .mermaid{display:flex;justify-content:center}
+</style></head><body>
+<header><h1>Resume Matching Agent: Milestone 4 (MCP)</h1>
+<p class="sub">Generated from docs/architecture.md. Open in a browser (needs internet for the Mermaid renderer).</p></header>
+<section><h2>1. Component view</h2><pre class="mermaid">
+flowchart LR
+    subgraph AGENT[&quot;matching_agent.py · LangGraph&quot;]
+        G[&quot;StateGraph nodes&quot;] --&gt; ENG[&quot;matching_engine.py&lt;br/&gt;pure scoring, no I/O&quot;]
+        G --&gt; MC[&quot;MultiMCPClient&lt;br/&gt;mcp_client.py&quot;]
+    end
+
+    MC -- &quot;JSON-RPC 2.0 · stdio&quot; --&gt; FS
+    MC -- &quot;JSON-RPC 2.0 · stdio&quot; --&gt; DB
+    MC -. &quot;optional, disabled by default&quot; .-&gt; WS[&quot;web-search MCP server&lt;br/&gt;(third party)&quot;]
+
+    subgraph FS[&quot;filesystem_mcp_server.py&quot;]
+        T1[&quot;Milestone 1 tools&lt;br/&gt;list_files · read_file · write_file&lt;br/&gt;search_files · get_file_metadata&quot;]
+        T2[&quot;New capabilities&lt;br/&gt;watch_directory · stop_watch · list_watches&lt;br/&gt;batch_process&quot;]
+        R1[&quot;Resources&lt;br/&gt;resume://{filename} · fs://files/{+path}&lt;br/&gt;watch://{watch_id} · config://server · server://capabilities&quot;]
+    end
+
+    subgraph DB[&quot;jobs_db_mcp_server.py (bonus)&quot;]
+        T3[&quot;get_job · list_jobs · add_job&lt;br/&gt;save_match_results · get_match_history · get_top_candidates&quot;]
+        R2[&quot;Resources&lt;br/&gt;jobs://{job_id} · db://schema&quot;]
+    end
+
+    FS --&gt; DISK[(&quot;data/ sandbox&lt;br/&gt;resumes · jobs · output&quot;)]
+    DB --&gt; SQL[(&quot;SQLite&lt;br/&gt;data/jobs.db&quot;)]
+    HOST[&quot;Claude Desktop / any MCP host&quot;] -. &quot;same server, no code changes&quot; .-&gt; FS
+
+    PROTO[&quot;mcp_protocol.py&lt;br/&gt;JSON-RPC 2.0 + MCP lifecycle&lt;br/&gt;stdio &amp; Streamable HTTP&quot;]
+    PROTO -.-&gt; FS
+    PROTO -.-&gt; DB
+</pre></section>
+<section><h2>2. Agent state machine (LangGraph)</h2><pre class="mermaid">
+stateDiagram-v2
+    [*] --&gt; connect_and_discover
+    connect_and_discover --&gt; load_job : initialize + tools/list on every server
+    load_job --&gt; discover_resumes : job found
+    load_job --&gt; finalize : unknown job_id
+    discover_resumes --&gt; extract_resumes : resumes found
+    discover_resumes --&gt; wait_for_new_resumes : none yet, watch on
+    discover_resumes --&gt; finalize : none, watch off
+    extract_resumes --&gt; analyze_candidates : batch_process()
+    analyze_candidates --&gt; score_and_rank
+    score_and_rank --&gt; explain_matches
+    explain_matches --&gt; publish_results
+    publish_results --&gt; wait_for_new_resumes : watch on, cycles left
+    publish_results --&gt; finalize : otherwise
+    wait_for_new_resumes --&gt; extract_resumes : new or modified resumes
+    wait_for_new_resumes --&gt; score_and_rank : a resume was deleted
+    wait_for_new_resumes --&gt; wait_for_new_resumes : nothing yet, cycles left
+    wait_for_new_resumes --&gt; finalize : cycles used up
+    finalize --&gt; [*] : stop_watch, status
+</pre></section>
+<section><h2>3. Agent ↔ MCP interaction (sequence)</h2><pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant A as LangGraph agent
+    participant C as MCP client
+    participant FS as filesystem MCP server
+    participant DB as jobs-db MCP server
+
+    A-&gt;&gt;C: MultiMCPClient.connect()
+    C-&gt;&gt;FS: initialize {protocolVersion: 2025-11-25}
+    FS--&gt;&gt;C: capabilities {tools, resources(subscribe, listChanged), logging}
+    C-&gt;&gt;FS: notifications/initialized
+    C-&gt;&gt;FS: tools/list
+    C-&gt;&gt;DB: initialize, notifications/initialized, tools/list
+
+    A-&gt;&gt;C: get_job(&quot;JOB-001&quot;)
+    C-&gt;&gt;DB: tools/call get_job
+    DB--&gt;&gt;C: required / preferred skills, min years
+
+    A-&gt;&gt;C: watch_directory(timeout 0)
+    C-&gt;&gt;FS: tools/call watch_directory
+    FS--&gt;&gt;C: watch_id
+
+    A-&gt;&gt;C: batch_process(paths)
+    C-&gt;&gt;FS: tools/call batch_process (_meta.progressToken)
+    loop each file, 4 worker threads
+        FS--)C: notifications/progress
+    end
+    FS--&gt;&gt;C: 5 ok, 1 error (isolated, not fatal)
+
+    Note over A: analyze, score, explain (no I/O)
+
+    A-&gt;&gt;C: write_file(report.md)
+    C-&gt;&gt;FS: tools/call write_file
+    A-&gt;&gt;C: save_match_results(ranked)
+    C-&gt;&gt;DB: tools/call save_match_results
+
+    A-&gt;&gt;C: watch_directory(watch_id, timeout 10)
+    C-&gt;&gt;FS: tools/call watch_directory (blocks)
+    Note over FS: recruiter drops karthik_nair.txt
+    FS--)C: notifications/resources/list_changed
+    FS--&gt;&gt;C: new_files: [resumes/karthik_nair.txt]
+    A-&gt;&gt;C: batch_process([new file]), re-rank, publish
+    A-&gt;&gt;C: stop_watch(watch_id)
+    C-&gt;&gt;FS: close stdin (stdio shutdown)
+</pre></section>
+<script type="module">
+ import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+ mermaid.initialize({startOnLoad:true, theme:'neutral', securityLevel:'loose'});
+</script></body></html>

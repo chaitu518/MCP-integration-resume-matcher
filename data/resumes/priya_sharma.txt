@@ -1,0 +1,17 @@
+Priya Sharma
+Senior Backend Engineer | Hyderabad | priya.sharma@example.com
+
+SUMMARY
+Backend engineer with 6 years of experience building high-throughput payment and trading systems in Java.
+
+SKILLS
+Java, Spring Boot, Microservices, Kafka, Redis, PostgreSQL, MySQL, Docker, Kubernetes, AWS, REST APIs, JUnit, CI/CD, Git
+
+EXPERIENCE
+Senior Software Engineer, FinEdge Payments (2021 - present)
+- Designed event-driven settlement pipeline on Kafka processing 40M events/day
+- Cut p99 latency of the ledger API by 45% with Redis caching and query tuning
+- Led migration of 12 Spring Boot microservices to Kubernetes on AWS EKS
+
+Software Engineer, Infosys (2019 - 2021)
+- Built REST APIs in Java and Spring for a retail banking client

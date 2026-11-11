@@ -1,0 +1,12 @@
+Sneha Kapoor
+Frontend Engineer | Gurugram | sneha.kapoor@example.com
+
+SUMMARY
+Frontend engineer with 4 years of experience in React and TypeScript.
+
+SKILLS
+JavaScript, TypeScript, React, Next.js, Redux, HTML, CSS, Tailwind, Node.js, GraphQL, Jest, Git
+
+EXPERIENCE
+Frontend Engineer, Zomato (2021 - present)
+- Rebuilt checkout in Next.js, improving conversion by 6%

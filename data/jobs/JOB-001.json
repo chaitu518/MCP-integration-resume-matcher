@@ -1,0 +1,22 @@
+{
+  "job_id": "JOB-001",
+  "title": "Senior Java Backend Engineer",
+  "company": "Acme Capital Markets",
+  "location": "Hyderabad",
+  "min_years": 4,
+  "required_skills": [
+    "Java",
+    "Spring Boot",
+    "Kafka",
+    "Microservices",
+    "SQL"
+  ],
+  "preferred_skills": [
+    "Redis",
+    "Kubernetes",
+    "AWS",
+    "Docker",
+    "PostgreSQL"
+  ],
+  "description": "Design and build low-latency Java microservices for trade processing. You will own event-driven pipelines on Kafka, Spring Boot services, caching with Redis and deployments on Kubernetes in AWS. Strong SQL and system design required."
+}

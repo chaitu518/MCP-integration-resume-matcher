@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+data/jobs.db
+data/output/
+data/resumes/karthik_nair.txt
+.env
+setup_windows.ps1
+requirements.txt

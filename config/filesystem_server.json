@@ -1,0 +1,21 @@
+{
+  "root_dir": "data",
+  "resume_dir": "resumes",
+  "output_dir": "output",
+  "allowed_extensions": [".txt", ".md", ".pdf", ".docx", ".json", ".csv"],
+  "resume_extensions": [".pdf", ".docx", ".txt", ".md"],
+  "writable_extensions": [".txt", ".md", ".json", ".csv"],
+  "max_file_size_mb": 10,
+  "allow_write": true,
+  "batch_max_workers": 4,
+  "batch_max_files": 200,
+  "text_cache_size": 256,
+  "watch_poll_interval": 1.0,
+  "watch_max_timeout": 300,
+  "max_watches": 10,
+  "page_size": 50,
+  "log_level": "INFO",
+  "transport": "stdio",
+  "http_host": "127.0.0.1",
+  "http_port": 8765
+}

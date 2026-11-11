@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "description": "Resume folder: read / batch-extract / watch (filesystem_mcp_server.py)",
+      "command": "${PYTHON}",
+      "args": ["${PROJECT_DIR}/filesystem_mcp_server.py", "--log-level", "WARNING"],
+      "required": true
+    },
+    "jobs_db": {
+      "description": "Bonus: SQLite job postings + match history (jobs_db_mcp_server.py)",
+      "command": "${PYTHON}",
+      "args": ["${PROJECT_DIR}/jobs_db_mcp_server.py", "--log-level", "WARNING"],
+      "required": false
+    },
+    "web_search": {
+      "description": "Optional third-party MCP server. Enable it and set BRAVE_API_KEY to try it.",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": { "BRAVE_API_KEY": "${BRAVE_API_KEY}" },
+      "enabled": false,
+      "required": false
+    }
+  }
+}

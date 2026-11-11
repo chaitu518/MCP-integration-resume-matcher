@@ -1,0 +1,13 @@
+Karthik Nair
+Backend Engineer | Kochi | karthik.nair@example.com
+
+SUMMARY
+Backend engineer with 5 years of experience in Java, Kafka and cloud-native systems.
+
+SKILLS
+Java, Spring Boot, Kafka, Redis, MongoDB, Docker, Kubernetes, AWS, Microservices, gRPC, PostgreSQL, CI/CD
+
+EXPERIENCE
+Backend Engineer, Swiggy (2021 - present)
+- Built order-tracking microservices on Kafka and Redis handling 1M orders/day
+- Ran services on Kubernetes (EKS) with Prometheus and Grafana monitoring
